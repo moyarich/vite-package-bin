@@ -1,0 +1,21 @@
+# Building package bins
+
+`packageBinBuild` discovers managed package bins and runs a separate Vite build for every Node CLI.
+
+```ts
+packageBinBuild({
+  entries: [{ pattern: "src/cli/**/*.ts" }],
+  emptyOutDir: true,
+  outDir: "dist/bin",
+  external: ["commander"],
+  sources: { "tool": "src/cli/main.ts" },
+});
+```
+
+A command declared as `"tool": "./dist/bin/tool.mjs"` is built to its exact manifest destination.
+
+Each executable is independently bundled with code splitting disabled. Node built-ins are externalized. CLI entries receive `#!/usr/bin/env node` unless their source already has a shebang. Shell scripts are copied and made executable.
+
+If two source files share a basename corresponding to the same command, discovery raises `Package bin source collision`. Narrow the entry patterns or use explicit `sources`.
+
+When `emptyOutDir` is enabled, all declared bin destinations must reside beneath the configured output directory.
