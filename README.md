@@ -1,71 +1,107 @@
-# @moyarich/vite-plugin-package-bin
+# @moyarich/vite-package-bin
 
-Vite plugin for building `package.json#bin` entries as independent Node.js executables and copying executable shell scripts.
+Build Node.js command-line executables declared in `package.json#bin` using Vite. Each command receives its own bundle at the exact path specified by the manifest. Shell executable entries can be copied alongside them.
 
-## Install and configure
+## Installation
 
-```ts
-import { defineConfig } from "vite";
-import { packageBinBuild } from "@moyarich/vite-plugin-package-bin";
-
-export default defineConfig({
-  plugins: [packageBinBuild({
-    emptyOutDir: true,
-    outDir: "dist/bin",
-    sources: {
-      "reusable-workflows-cli": "src/commands/main.ts",
-      "check-dist": "src/commands/check-dist.ts",
-    },
-  })],
-});
+```sh
+npm install -D @moyarich/vite-package-bin vite typescript
 ```
+
+This repository configures publishing to GitHub Packages. Configure your npm registry/authentication accordingly.
+
+## Quick start
+
+Declare the command(s) in your application's `package.json`:
 
 ```json
 {
+  "name": "@example/toolkit",
+  "type": "module",
   "bin": {
-    "reusable-workflows-cli": "./dist/bin/reusable-workflows-cli.mjs",
+    "toolkit": "./dist/bin/toolkit.mjs",
     "check-dist": "./dist/bin/check-dist.mjs"
-  }
+  },
+  "scripts": { "build": "vite build" }
 }
 ```
 
-Every CLI builds independently to the exact destination declared by `package.json#bin` (supported extensions: `.js`, `.mjs`, `.cjs`). A string-valued `bin` is also supported, using the unscoped package name. The plugin adds a Node shebang unless the source supplies one and sets executable permissions.
-
-## Discovery
-
-Without `sources`, the plugin matches command names from `package.json#bin` to source basenames. Default source patterns are `src/**/*.ts` and `src/cli/**/*.sh`. Use `entries` to narrow source discovery:
+Create `src/commands/toolkit.ts`:
 
 ```ts
-packageBinBuild({
-  entries: [
-    { pattern: "src/cli/**/*.ts" },
-    { pattern: "src/cli/**/*.sh", bin: "./dist/bin/{name}.sh" },
+#!/usr/bin/env node
+import { Command } from "commander";
+
+const program = new Command();
+program.name("toolkit").description("Example CLI").version("1.0.0");
+program.command("hello").action(() => console.log("Hello!"));
+program.parse();
+```
+
+Create `src/commands/check-dist.ts` as another executable entry point, then configure `vite.config.ts`:
+
+```ts
+import { defineConfig } from "vite";
+import { packageBinBuild } from "@moyarich/vite-package-bin";
+
+export default defineConfig({
+  plugins: [
+    packageBinBuild({
+      emptyOutDir: true,
+      outDir: "dist/bin",
+      sources: {
+        toolkit: "src/commands/toolkit.ts",
+        "check-dist": "src/commands/check-dist.ts",
+      },
+    }),
   ],
-  emptyOutDir: true,
-  outDir: "dist/bin",
 });
 ```
 
-Explicit `sources` override basename discovery for the specified commands and avoid accidental matches with shared helper modules. Every declared bin must resolve to exactly one source. Source collisions report matching paths.
+Run `npm run build` and then `node dist/bin/toolkit.mjs hello`. To expose executables with `npx`, publish/install the **consumer** package containing the `bin` declarations; `npx @example/toolkit` selects the package's executable when npm can determine a default bin.
 
-Shell scripts are copied without Vite bundling, made executable (`0755`), and must supply their own shebang (e.g. `#!/usr/bin/env bash`).
+## How entries are resolved
 
-## Output and validation
+The `bin` field defines command names **and output paths**; `sources` maps those names to TypeScript/JavaScript source entry points. Explicit mappings are recommended when filenames differ from commands, or helpers share the same basename.
 
-- CLI output extensions can be `.js`, `.mjs`, or `.cjs`.
-- Command sources and destinations must remain within the package root.
-- `emptyOutDir: true` clears `outDir` once and requires all declared bins to reside underneath it.
-- Validation (default `true`) checks existence, executable permissions, and shebang for every declared bin.
-- Configure `external`, `target`, `sourcemap`, and `minify` to customize Vite builds.
-- Node built-ins (`node:`) are always externalized.
-- Executables have independent builds with code splitting disabled.
+If `sources` is omitted, the plugin discovers entries by matching `package.json#bin` command names with source basenames. Default patterns are `src/**/*.ts` and `src/cli/**/*.sh`. Narrow discovery with `entries` to exclude unrelated files:
 
-GitHub Actions and reusable `_assets` chunks are a separate build responsibility; this plugin handles npm package executables only.
+```ts
+packageBinBuild({
+  emptyOutDir: true,
+  outDir: "dist/bin",
+  entries: [
+    { pattern: "src/commands/**/*.ts" },
+    { pattern: "src/cli/**/*.sh", bin: "./dist/bin/{name}.sh" },
+  ],
+});
+```
+
+The default Node discovery template is `./<outDir>/{name}.mjs`. When using custom extension or destination paths, prefer explicit `sources`.
+
+## Build behavior
+
+- Node outputs support `.js`, `.mjs`, and `.cjs`; the output path comes from `package.json#bin`.
+- Each Node command is built independently; shared chunks are **not** generated across CLI executables.
+- Built-in `node:` imports are externalized; add other runtime external dependencies using `external`.
+- Node executables get a `#!/usr/bin/env node` shebang unless their source already has one, and executable permissions.
+- Shell files are copied without bundling and require their own shebang.
+- `validate` defaults to `true` and checks that each bin exists, has executable permissions, and begins with a shebang.
+- `emptyOutDir: true` removes the configured output directory first; every declared bin destination must be inside it.
+- Source and output paths must stay within the project root.
+
+GitHub Actions bundles and shared Action asset chunks are separate concerns; this plugin builds npm `bin` executables.
+
+## Documentation
+
+[Getting started](docs/01-getting-started/page.mdx) · [Building package bins](docs/02-guides/01-building-package-bins/page.mdx) · [API reference](docs/03-reference/01-package-bin-build/page.mdx) · [Examples](examples/README.md)
 
 ## Development
 
-```bash
+```sh
 npm run build
-npm run test
 npm run typecheck
+npm run test
 ```
+
+These are repository scripts; actual validation requires installing the project's dependencies.
