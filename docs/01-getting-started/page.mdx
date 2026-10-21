@@ -1,0 +1,24 @@
+# Getting started
+
+Install `@moyarich/vite-plugin-package-bin` alongside Vite, then add `packageBinBuild` to the Vite configuration.
+
+```ts
+import { defineConfig } from "vite";
+import { packageBinBuild } from "@moyarich/vite-plugin-package-bin";
+
+export default defineConfig({
+  plugins: [packageBinBuild({
+    emptyOutDir: true,
+    outDir: "dist/bin",
+    sources: { "example": "src/cli/main.ts" },
+  })],
+});
+```
+
+Declare the executable:
+
+```json
+{ "bin": { "example": "./dist/bin/example.mjs" } }
+```
+
+Without `sources`, discovery uses command names and source basenames with the default `src/**/*.ts` pattern. Narrow `entries` when needed. The plugin generates a shebang and validates the published binaries.
