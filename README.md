@@ -1,4 +1,4 @@
-# @moyarich/vite-plugin-package-bin
+# @moyarich/vite-package-bin
 
 Vite plugin for building `package.json#bin` entries as independent Node.js executables and copying executable shell scripts.
 
@@ -6,7 +6,7 @@ Vite plugin for building `package.json#bin` entries as independent Node.js execu
 
 ```ts
 import { defineConfig } from "vite";
-import { packageBinBuild } from "@moyarich/vite-plugin-package-bin";
+import { packageBinBuild } from "@moyarich/vite-package-bin";
 
 export default defineConfig({
   plugins: [packageBinBuild({
