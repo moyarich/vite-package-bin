@@ -1,0 +1,31 @@
+# `packageBinBuild`
+
+Builds `package.json#bin` executables with Vite.
+
+## Options
+
+| Option | Type | Default |
+| --- | --- | --- |
+| `entries` | `PackageBinEntry | PackageBinEntry[]` | `src/**/*.ts` and `src/cli/**/*.sh` |
+| `sources` | `Record<string, string>` | `{}` |
+| `emptyOutDir` | `boolean` | Required |
+| `outDir` | `string` | `bin` |
+| `target` | `string` | `node24` |
+| `sourcemap` | `boolean` | `false` |
+| `minify` | `boolean` | `false` |
+| `external` | `Array<string | RegExp>` | `[]` |
+| `validate` | `boolean` | `true` |
+
+`sources` maps declared command names to existing source files within the package. All destination paths are derived from `package.json#bin`, must remain within the package root, and must use `.js`, `.mjs`, `.cjs`, or `.sh` extension. Shell files must supply their own shebang.
+
+Validation checks that every declared executable exists, is executable, and starts with `#!`.
+
+## Examples
+
+```ts
+packageBinBuild({
+  emptyOutDir: true,
+  outDir: "dist/bin",
+  sources: { "check-dist": "src/commands/check-dist.ts" },
+});
+```
