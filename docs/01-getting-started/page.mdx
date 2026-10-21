@@ -1,24 +1,48 @@
 # Getting started
 
-Install `@moyarich/vite-plugin-package-bin` alongside Vite, then add `packageBinBuild` to the Vite configuration.
+Install `@moyarich/vite-package-bin` and Vite in the package that owns your CLI.
+
+```sh
+npm install -D @moyarich/vite-package-bin vite typescript
+```
+
+The repository's publishing registry is GitHub Packages; configure registry authentication if installing from there.
+
+## Declare the executable
+
+```json
+{
+  "name": "@example/hello-cli",
+  "type": "module",
+  "bin": { "hello-cli": "./dist/bin/hello-cli.mjs" },
+  "scripts": { "build": "vite build" }
+}
+```
+
+Create `src/commands/main.ts`:
+
+```ts
+#!/usr/bin/env node
+console.log("Hello from the CLI");
+```
+
+Create `vite.config.ts`:
 
 ```ts
 import { defineConfig } from "vite";
-import { packageBinBuild } from "@moyarich/vite-plugin-package-bin";
+import { packageBinBuild } from "@moyarich/vite-package-bin";
 
 export default defineConfig({
-  plugins: [packageBinBuild({
-    emptyOutDir: true,
-    outDir: "dist/bin",
-    sources: { "example": "src/cli/main.ts" },
-  })],
+  plugins: [
+    packageBinBuild({
+      emptyOutDir: true,
+      outDir: "dist/bin",
+      sources: { "hello-cli": "src/commands/main.ts" },
+    }),
+  ],
 });
 ```
 
-Declare the executable:
+Run `npm run build`, then `node dist/bin/hello-cli.mjs`.
 
-```json
-{ "bin": { "example": "./dist/bin/example.mjs" } }
-```
-
-Without `sources`, discovery uses command names and source basenames with the default `src/**/*.ts` pattern. Narrow `entries` when needed. The plugin generates a shebang and validates the published binaries.
+The manifest controls the output filename, while `sources` maps a command to its source file. See [multi-command examples](../../examples/README.md) and [the build guide](../02-guides/01-building-package-bins/page.mdx).
