@@ -1,31 +1,30 @@
-# `packageBinBuild`
+# API reference: `packageBinBuild`
 
-Builds `package.json#bin` executables with Vite.
+Import `packageBinBuild` from `@moyarich/vite-package-bin` and add it to `plugins` in `vite.config.ts`.
 
-## Options
-
-| Option | Type | Default |
+| Option | Type | Default / behavior |
 | --- | --- | --- |
-| `entries` | `PackageBinEntry | PackageBinEntry[]` | `src/**/*.ts` and `src/cli/**/*.sh` |
-| `sources` | `Record<string, string>` | `{}` |
+| `entries` | `PackageBinEntry \| PackageBinEntry[]` | `src/**/*.ts` and `src/cli/**/*.sh` |
+| `sources` | `Record<string, string>` | Explicit command-name → source-path mappings; otherwise basename discovery |
 | `emptyOutDir` | `boolean` | Required |
 | `outDir` | `string` | `bin` |
 | `target` | `string` | `node24` |
 | `sourcemap` | `boolean` | `false` |
 | `minify` | `boolean` | `false` |
-| `external` | `Array<string | RegExp>` | `[]` |
+| `external` | `Array<string \| RegExp>` | `[]`; `node:` dependencies always externalized |
 | `validate` | `boolean` | `true` |
 
-`sources` maps declared command names to existing source files within the package. All destination paths are derived from `package.json#bin`, must remain within the package root, and must use `.js`, `.mjs`, `.cjs`, or `.sh` extension. Shell files must supply their own shebang.
+`PackageBinEntry` has `pattern: string` and optional `bin?: string`; `{name}` in the template is replaced by the source basename.
 
-Validation checks that every declared executable exists, is executable, and starts with `#!`.
+### Exports
 
-## Examples
+- `packageBinBuild(options)` — Vite plugin coordinating builds and copying shell bins.
+- `readManagedPackageBins(root?)` — read and normalize manifest `bin` declarations.
+- `discoverCliEntries(entries?, root?, bins?, defaultBinPattern?, sources?)` — resolve entry paths.
+- `standaloneCliBuilds(entries, options?, root?, bins?)` — produce one Vite config for each Node command.
+- `copyShellCliEntries(entries, bins, root?)` — copy and chmod shell executables.
+- `validatePackageBins(bins, root?)` — check existence, executable bit, and shebang.
 
-```ts
-packageBinBuild({
-  emptyOutDir: true,
-  outDir: "dist/bin",
-  sources: { "check-dist": "src/commands/check-dist.ts" },
-});
-```
+Node output extensions: `.js`, `.mjs`, `.cjs`. Shell outputs: `.sh`. Each destination must be within the package root, and all destinations must be inside `outDir` when `emptyOutDir` is enabled.
+
+Each Node CLI is bundled independently; shared chunks are not supported for package-bin builds.
