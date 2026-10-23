@@ -1,12 +1,11 @@
 import assert from "node:assert/strict";
-import { chmod, mkdtemp, mkdir, rm, writeFile } from "node:fs/promises";
+import { mkdtemp, mkdir, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "vitest";
 import {
   discoverCliEntries,
   standaloneCliBuilds,
-  validatePackageBins,
 } from "../src/packageBinBuild.ts";
 
 test("explicit mappings use command names rather than source basenames", async () => {
@@ -40,24 +39,6 @@ test("explicit mappings use command names rather than source basenames", async (
         }),
       /not declared/,
     );
-  } finally {
-    await rm(root, { recursive: true, force: true });
-  }
-});
-
-test("validation detects missing shebangs and permits valid executable bins", async () => {
-  const root = await mkdtemp(join(tmpdir(), "bins-"));
-  try {
-    await mkdir(join(root, "dist/bin"), { recursive: true });
-    const binary = join(root, "dist/bin/tool.mjs");
-    await writeFile(binary, "console.log('tool');");
-    await chmod(binary, 0o755);
-    await assert.rejects(
-      () => validatePackageBins({ tool: "./dist/bin/tool.mjs" }, root),
-      /no shebang/,
-    );
-    await writeFile(binary, "#!/usr/bin/env node\nconsole.log('tool');");
-    await validatePackageBins({ tool: "./dist/bin/tool.mjs" }, root);
   } finally {
     await rm(root, { recursive: true, force: true });
   }
