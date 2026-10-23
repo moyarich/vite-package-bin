@@ -3,11 +3,18 @@ import { test } from "vitest";
 import { standaloneCliBuilds } from "../src/packageBinBuild.ts";
 
 test("creates one independent build per CLI entry", () => {
-  const builds = standaloneCliBuilds({
-    alpha: "/repo/src/cli/alpha.ts",
-    beta: "/repo/src/cli/beta.ts",
-  }, {}, "/repo");
-  assert.deepEqual(builds.map(({ name }) => name), ["alpha", "beta"]);
+  const builds = standaloneCliBuilds(
+    {
+      alpha: "/repo/src/cli/alpha.ts",
+      beta: "/repo/src/cli/beta.ts",
+    },
+    {},
+    "/repo",
+  );
+  assert.deepEqual(
+    builds.map(({ name }) => name),
+    ["alpha", "beta"],
+  );
   for (const { name, config } of builds) {
     assert.equal(config.configFile, false);
     assert.equal(config.build?.emptyOutDir, false);
@@ -21,13 +28,17 @@ test("creates one independent build per CLI entry", () => {
 });
 
 test("preserves CLI build options", () => {
-  const [build] = standaloneCliBuilds({ demo: "/repo/demo.ts" }, {
-    outDir: "dist/bin",
-    target: "node24",
-    sourcemap: true,
-    minify: true,
-    external: ["commander"],
-  }, "/repo");
+  const [build] = standaloneCliBuilds(
+    { demo: "/repo/demo.ts" },
+    {
+      outDir: "dist/bin",
+      target: "node24",
+      sourcemap: true,
+      minify: true,
+      external: ["commander"],
+    },
+    "/repo",
+  );
   assert.equal(build.config.build?.outDir, "/repo/dist/bin");
   assert.equal(build.config.build?.target, "node24");
   assert.equal(build.config.build?.sourcemap, true);

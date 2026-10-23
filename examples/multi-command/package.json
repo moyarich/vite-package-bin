@@ -2,7 +2,9 @@
   "name": "@example/multi-command",
   "private": true,
   "type": "module",
-  "scripts": { "build": "vite build" },
+  "scripts": {
+    "build": "vite build"
+  },
   "bin": {
     "toolkit": "./dist/bin/toolkit.mjs",
     "check-dist": "./dist/bin/check-dist.mjs"

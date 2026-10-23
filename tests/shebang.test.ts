@@ -12,17 +12,27 @@ test("adds a Node shebang only when the source is missing one", async () => {
     const withoutShebang = join(root, "without-shebang.ts");
     await writeFile(withShebang, "#!/usr/bin/env node\nconsole.log('with');\n");
     await writeFile(withoutShebang, "console.log('without');\n");
-    const builds = standaloneCliBuilds({
-      "with-shebang": withShebang,
-      "without-shebang": withoutShebang,
-    }, {}, root);
+    const builds = standaloneCliBuilds(
+      {
+        "with-shebang": withShebang,
+        "without-shebang": withoutShebang,
+      },
+      {},
+      root,
+    );
     for (const { name, config } of builds) {
       const output = config.build?.rollupOptions?.output;
       assert.ok(output && !Array.isArray(output));
       assert.equal(typeof output.banner, "function");
-      if (typeof output.banner !== "function") throw new TypeError("Expected Rollup banner to be a function.");
+      if (typeof output.banner !== "function")
+        throw new TypeError("Expected Rollup banner to be a function.");
       const banner = await output.banner({} as never);
-      assert.equal(banner, name === "with-shebang" ? "" : "#!/usr/bin/env node");
+      assert.equal(
+        banner,
+        name === "with-shebang" ? "" : "#!/usr/bin/env node",
+      );
     }
-  } finally { await rm(root, { recursive: true, force: true }); }
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
 });

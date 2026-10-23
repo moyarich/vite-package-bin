@@ -2,17 +2,17 @@
 
 Import `packageBinBuild` from `@moyarich/vite-package-bin` and add it to `plugins` in `vite.config.ts`.
 
-| Option | Type | Default / behavior |
-| --- | --- | --- |
-| `entries` | `PackageBinEntry \| PackageBinEntry[]` | `src/**/*.ts` and `src/cli/**/*.sh` |
-| `sources` | `Record<string, string>` | Explicit command-name → source-path mappings; otherwise basename discovery |
-| `emptyOutDir` | `boolean` | Required |
-| `outDir` | `string` | `bin` |
-| `target` | `string` | `node24` |
-| `sourcemap` | `boolean` | `false` |
-| `minify` | `boolean` | `false` |
-| `external` | `Array<string \| RegExp>` | `[]`; `node:` dependencies always externalized |
-| `validate` | `boolean` | `true` |
+| Option        | Type                                   | Default / behavior                                                         |
+| ------------- | -------------------------------------- | -------------------------------------------------------------------------- |
+| `entries`     | `PackageBinEntry \| PackageBinEntry[]` | `src/**/*.ts` and `src/cli/**/*.sh`                                        |
+| `sources`     | `Record<string, string>`               | Explicit command-name → source-path mappings; otherwise basename discovery |
+| `emptyOutDir` | `boolean`                              | Required                                                                   |
+| `outDir`      | `string`                               | `bin`                                                                      |
+| `target`      | `string`                               | `node24`                                                                   |
+| `sourcemap`   | `boolean`                              | `false`                                                                    |
+| `minify`      | `boolean`                              | `false`                                                                    |
+| `external`    | `Array<string \| RegExp>`              | `[]`; `node:` dependencies always externalized                             |
+| `validate`    | `boolean`                              | `true`                                                                     |
 
 `PackageBinEntry` has `pattern: string` and optional `bin?: string`; `{name}` in the template is replaced by the source basename.
 

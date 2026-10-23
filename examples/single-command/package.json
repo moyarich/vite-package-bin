@@ -2,6 +2,10 @@
   "name": "@example/single-command",
   "private": true,
   "type": "module",
-  "scripts": { "build": "vite build" },
-  "bin": { "hello-cli": "./dist/bin/hello-cli.mjs" }
+  "scripts": {
+    "build": "vite build"
+  },
+  "bin": {
+    "hello-cli": "./dist/bin/hello-cli.mjs"
+  }
 }
