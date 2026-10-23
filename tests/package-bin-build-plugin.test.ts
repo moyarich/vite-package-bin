@@ -1,14 +1,16 @@
 import { beforeEach, expect, test, vi } from "vitest";
 
-const { build, chmod, copyFile, glob, mkdir, readFile, rm } = vi.hoisted(() => ({
-  build: vi.fn(),
-  chmod: vi.fn(),
-  copyFile: vi.fn(),
-  glob: vi.fn(),
-  mkdir: vi.fn(),
-  readFile: vi.fn(),
-  rm: vi.fn(),
-}));
+const { build, chmod, copyFile, glob, mkdir, readFile, rm } = vi.hoisted(
+  () => ({
+    build: vi.fn(),
+    chmod: vi.fn(),
+    copyFile: vi.fn(),
+    glob: vi.fn(),
+    mkdir: vi.fn(),
+    readFile: vi.fn(),
+    rm: vi.fn(),
+  }),
+);
 
 vi.mock("node:fs/promises", async (importOriginal) => ({
   ...(await importOriginal<typeof import("node:fs/promises")>()),
