@@ -30,10 +30,9 @@ test("explicit mappings use command names rather than source basenames", async (
       "workflows-cli": "./dist/bin/workflows-cli.mjs",
     });
     assert.equal(builds[0].config.build?.outDir, join(root, "dist/bin"));
-    assert.equal(
-      builds[0].config.build?.rollupOptions?.output?.entryFileNames,
-      "workflows-cli.mjs",
-    );
+    const output = builds[0].config.build?.rollupOptions?.output;
+    assert.ok(output && !Array.isArray(output));
+    assert.equal(output.entryFileNames, "workflows-cli.mjs");
     await assert.rejects(
       () =>
         discoverCliEntries([], root, { foo: "./bin/foo.mjs" }, undefined, {
