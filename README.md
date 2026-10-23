@@ -1,11 +1,11 @@
-# @moyarich/vite-package-bin
+# @moyarich/vite-plugin-package-bin
 
 Build Node.js command-line executables declared in `package.json#bin` using Vite. Each command receives its own bundle at the exact path specified by the manifest. Shell executable entries can be copied alongside them.
 
 ## Installation
 
 ```sh
-npm install -D @moyarich/vite-package-bin vite typescript
+npm install -D @moyarich/vite-plugin-package-bin vite typescript
 ```
 
 This repository configures publishing to GitHub Packages. Configure your npm registry/authentication accordingly.
@@ -42,7 +42,7 @@ Create `src/commands/check-dist.ts` as another executable entry point, then conf
 
 ```ts
 import { defineConfig } from "vite";
-import { packageBinBuild } from "@moyarich/vite-package-bin";
+import { packageBinBuild } from "@moyarich/vite-plugin-package-bin";
 
 export default defineConfig({
   plugins: [
