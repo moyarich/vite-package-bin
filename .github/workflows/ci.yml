@@ -1,0 +1,32 @@
+name: CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+    paths:
+      - "src/**"
+      - "tests/**"
+      - "package.json"
+      - "vite.config.ts"
+      - "tsconfig.json"
+      - ".github/workflows/**"
+  workflow_dispatch:
+    inputs:
+      checkout-sha:
+        description: Exact commit SHA to validate
+        type: string
+        required: false
+        default: ""
+permissions:
+  contents: read
+  packages: read
+concurrency:
+  group: ci-${{ github.repository }}-${{ github.workflow }}-${{ github.event.pull_request.number || inputs.checkout-sha || github.ref }}
+  cancel-in-progress: false
+jobs:
+  actionlint:
+    uses: ./.github/workflows/ci_actionlint.yml
+  cli:
+    uses: ./.github/workflows/ci_cli.yml
+    with:
+      checkout-sha: ${{ inputs.checkout-sha || '' }}
