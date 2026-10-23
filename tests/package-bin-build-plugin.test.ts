@@ -1,10 +1,11 @@
 import { beforeEach, expect, test, vi } from "vitest";
 
-const { build, chmod, copyFile, glob, readFile, rm } = vi.hoisted(() => ({
+const { build, chmod, copyFile, glob, mkdir, readFile, rm } = vi.hoisted(() => ({
   build: vi.fn(),
   chmod: vi.fn(),
   copyFile: vi.fn(),
   glob: vi.fn(),
+  mkdir: vi.fn(),
   readFile: vi.fn(),
   rm: vi.fn(),
 }));
@@ -14,6 +15,7 @@ vi.mock("node:fs/promises", async (importOriginal) => ({
   chmod,
   copyFile,
   glob,
+  mkdir,
   readFile,
   rm,
 }));
@@ -51,6 +53,7 @@ beforeEach(() => {
   });
   build.mockResolvedValue({});
   copyFile.mockResolvedValue(undefined);
+  mkdir.mockResolvedValue(undefined);
   rm.mockResolvedValue(undefined);
 });
 
@@ -94,6 +97,7 @@ test("builds Node package bins and copies shell package bins", async () => {
     }),
   );
   expect(chmod).toHaveBeenCalledWith("/repo/dist/bin/release.mjs", 0o755);
+  expect(mkdir).toHaveBeenCalledWith("/repo/dist/bin", { recursive: true });
   expect(copyFile).toHaveBeenCalledWith(
     "/repo/src/cli/install.sh",
     "/repo/dist/bin/install.sh",
