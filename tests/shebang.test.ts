@@ -3,7 +3,10 @@ import { chmod, mkdtemp, mkdir, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "vitest";
-import { standaloneCliBuilds, validatePackageBins } from "../src/packageBinBuild.ts";
+import {
+  standaloneCliBuilds,
+  validatePackageBins,
+} from "../src/packageBinBuild.ts";
 
 test("adds a Node shebang only when the source is missing one", async () => {
   const root = await mkdtemp(join(tmpdir(), "package-bin-build-"));
