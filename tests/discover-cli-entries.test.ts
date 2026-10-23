@@ -14,12 +14,18 @@ test("finds managed bins across multiple source locations", async () => {
     await writeFile(join(root, "scripts/diagnostics/doctor.ts"), "export {};");
     const entries = await discoverCliEntries(
       [{ pattern: "src/**/*.ts" }, { pattern: "scripts/**/*.ts" }],
-      root, { release: "./bin/release.mjs", doctor: "./bin/doctor.mjs" },
+      root,
+      { release: "./bin/release.mjs", doctor: "./bin/doctor.mjs" },
     );
-    assert.deepEqual(new Set(Object.keys(entries)), new Set(["doctor", "release"]));
+    assert.deepEqual(
+      new Set(Object.keys(entries)),
+      new Set(["doctor", "release"]),
+    );
     assert.equal(entries.release, join(root, "src/release/release.ts"));
     assert.equal(entries.doctor, join(root, "scripts/diagnostics/doctor.ts"));
-  } finally { await rm(root, { recursive: true, force: true }); }
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
 });
 
 test("ignores source files that are not managed package bins", async () => {
@@ -32,5 +38,7 @@ test("ignores source files that are not managed package bins", async () => {
       release: "./bin/release.mjs",
     });
     assert.deepEqual(Object.keys(entries), ["release"]);
-  } finally { await rm(root, { recursive: true, force: true }); }
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
 });
