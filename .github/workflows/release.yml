@@ -26,7 +26,7 @@ on:
         default: all
         options:
           - all
-          - @moyarich/vite-plugin-package-bin
+          - "@moyarich/vite-plugin-package-bin"
       version-mode:
         description: Resolve each package version
         type: choice
