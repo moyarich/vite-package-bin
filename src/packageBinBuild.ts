@@ -266,9 +266,18 @@ export function packageBinBuild(options: PackageBinBuildOptions): Plugin {
         entries: _entries, sources: _sources, validate: _validate,
         emptyOutDir: _emptyOutDir, ...buildOptions
       } = options;
+      const builtDestinations = new Map<string, string>();
       for (const { name, config } of standaloneCliBuilds(nodeEntries, buildOptions, root, bins)) {
+        const destination = destinationFor(root, bins[name]);
+        const previousSource = builtDestinations.get(destination);
+        if (previousSource) {
+          if (previousSource !== nodeEntries[name])
+            throw new Error(`Package bins targeting ${bins[name]} have different source files`);
+          continue;
+        }
         await build({ ...config, logLevel: resolvedConfig.logLevel });
-        await chmod(destinationFor(root, bins[name]), 0o755);
+        await chmod(destination, 0o755);
+        builtDestinations.set(destination, nodeEntries[name]);
       }
       await copyShellCliEntries(shellEntries, bins, root);
       if (options.validate !== false) await validatePackageBins(bins, root);
