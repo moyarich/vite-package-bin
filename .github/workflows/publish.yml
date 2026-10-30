@@ -25,16 +25,22 @@ on:
         default: all
         options:
           - all
-          - "@moyarich/vite-plugin-package-bin"
+          - "packages/example"
       registry:
-        description: Publish destination
+        description: Registry alias (npm, github, all, or a configured registry)
         required: true
-        default: github
-        type: choice
-        options:
-          - npm
-          - github
-          - all
+        default: npm
+        type: string
+      registries-file:
+        description: Optional caller repository registry YAML location
+        required: false
+        default: ""
+        type: string
+      registry-url:
+        description: Optional HTTPS registry URL override
+        required: false
+        default: ""
+        type: string
       version-mode:
         description: Publish manifest version or an exact version
         required: true
@@ -88,6 +94,8 @@ jobs:
       workspace-tools-source: ${{ inputs.workspace-tools-source }}
       package: ${{ inputs.package }}
       registry: ${{ inputs.registry }}
+      registries-file: ${{ inputs.registries-file }}
+      registry-url: ${{ inputs.registry-url }}
       version-mode: ${{ inputs.version-mode }}
       exact-version: ${{ inputs.exact-version }}
       verify-git-tag: ${{ inputs.verify-git-tag }}
@@ -96,3 +104,4 @@ jobs:
       tag: ${{ inputs.tag }}
     secrets:
       npm-token: ${{ secrets._NPM_TOKEN }}
+      custom-registry-token: ${{ secrets._CUSTOM_REGISTRY_TOKEN }}

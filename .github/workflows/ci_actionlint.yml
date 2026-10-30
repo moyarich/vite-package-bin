@@ -2,23 +2,11 @@ name: CI / Actionlint
 on:
   push:
     branches: [main]
-    paths:
+    paths: &actionlint_paths
       - ".github/workflows/**"
-      - "src/**"
-      - "tests/**"
-      - "package.json"
-      - "package-lock.json"
-      - "vite.config.ts"
-      - "tsconfig.json"
+      - ".github/actionlint.yaml"
   pull_request:
-    paths:
-      - ".github/workflows/**"
-      - "src/**"
-      - "tests/**"
-      - "package.json"
-      - "package-lock.json"
-      - "vite.config.ts"
-      - "tsconfig.json"
+    paths: *actionlint_paths
   workflow_call:
   workflow_dispatch:
 concurrency:
